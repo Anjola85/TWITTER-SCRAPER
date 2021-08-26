@@ -1,12 +1,16 @@
-import sys,tweepy
+import sys,tweepy, os
+from os.path import join, dirname
+from dotenv import load_dotenv
+dotenv_path = join(dirname(__file__), '.env')
+load_dotenv(dotenv_path)
 
 #authentication function
 def twitter_auth():
     try:
-        consumer_key = 'elhI4v5ChCqMHLwRcHOKMpu1s' #api_key
-        consumer_secret = "v5LbwgCcjRSE0s5DBsvGwAVZegIvX9VtL66q5DctnCOzxKcgHb"  #api_secret_key
-        access_token = "912250283383717888-QMnFLZfNzDTo0s2ZM9JqZIB7vXA6bvt" 
-        access_secret = "yUaiCGXVr4jCsiYhsS7qG0E3ByxrjtlFS8fiU2oS9TpVK"
+        consumer_key = os.environ.get("API_KEY") 
+        consumer_secret = os.environ.get("API_SECRET_KEY") 
+        access_token = os.environ.get("ACCESS_TOKEN") 
+        access_secret = os.environ.get("ACCESS_TOKEN_SECRET")
     except KeyError:
         sys.stderr.write("TWITTER_* environment variable not set\n")
         sys.exit(1)
