@@ -45,7 +45,7 @@ def check_tweet(tweet):
     
     if check:
         print("Tweet contains doge. Triggering buy via kraken API")
-        # call buy function
+        # call buy function and check if buy was successful
     else:
         print("Going to sleep for 7 seconds")
 
