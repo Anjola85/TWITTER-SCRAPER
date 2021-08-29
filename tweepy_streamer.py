@@ -8,6 +8,10 @@ from dotenv import load_dotenv
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
+# import twitter credentials
+import pandas as pd
+import numpy as np
+
 # global variables
 consumer_key = os.environ.get("CONSUMER_KEY") 
 consumer_secret = os.environ.get("CONSUMER_SECRET_KEY")
@@ -21,8 +25,10 @@ class TwitterClient():
         # authenticate to properly communicate with the Twitter API
         self.auth = TwitterAuthenticator().authenticate_twitter_app()
         self.twitter_client = API(self.auth)
-        
         self.twitter_user = twitter_user
+        
+    def get_twitter_client_api(self):
+        return self.twitter_client #returns Twittter API
 
     def get_user_timeline_tweets(self, num_tweets):
         tweets = []
@@ -41,14 +47,7 @@ class TwitterClient():
         for tweet in Cursor(self.twitter_client.home_timeline, id=self.twitter_user).items(num_tweets):
             home_timeline_tweets.append(tweet)
         return home_timeline_tweets
-    
-    # def get_specific_tweet(self, num_tweets):
-    #     tweets = []
-    #     for tweet in Cursor(self.twitter_client.seach_tweets(q="(d|D)(o|O)(g|G)(e|E)"), id=self.twitter_user).items(num_tweets):
-    #         tweets.append(tweet)
-    #     return tweets
         
-    
 
 class TwitterAuthenticator():
     
@@ -65,12 +64,17 @@ class TwitterStreamer():
     def __init__(self):
         self.twitter_authenticator = TwitterAuthenticator()
     
+    """
+    Returns every stream of tweet by twitter users.
+    @param Takes in two parameters
+    @fetched_tweets_filename: what format should be returned by the function.
+    @hash_tag_list: format tweet content should match.
+    """
     def stream_tweets(self, fetched_tweets_filename, hash_tag_list):
         # This handles Twitter authentication and the connection to the Twitter Streaming API.
         listener = TwitterListener()
         auth = self.twitter_authenticator.authenticate_twitter_app()
-        stream = Stream(auth, listener) #listener which handles the return, can be data or error
-        
+        stream = Stream(auth, listener) #listener which handles the return, can be data or errorå
         # This line filters Twitter Streams to capture data by keywords
         stream.filter(track=hash_tag_list)
         
@@ -103,15 +107,31 @@ class TwitterListener(StreamListener):
             return False
         print(status)
         
+class TweetAnalyzer():
+    """
+    Functionality for analyzing and categorizing content from tweets.
+    """
+    def tweets_to_data_frame(self, tweets):
+        # creating a list by extracting texts from eact tweets with column tweets
+        df = pd.DataFrame(data=[tweet.text for tweet in tweets], columns=['Tweets'])
+        #vice vers but id
+        df['id'] = np.array([tweet.id for tweet in tweets])
+        df['len'] = np.array([len(tweet.text) for tweet in tweets])
+        df['date'] = np.array([tweet.created_at for tweet in tweets])
+        df['source'] = np.array([tweet.source for tweet in tweets])
+        df['likes'] = np.array([tweet.favorite_count for tweet in tweets])
+        df['retweets'] = np.array([tweet.retweet_count for tweet in tweets])
+        return df
         
 if __name__ == "__main__":
-    # can pass hash_tag list that corresponds to tweet in track=""
-    # hash_tag_lisy = []
-    match_doge = "(d|D)(o|O)(g|G)(e|E)" #regex to match doge word
-    fetched_tweets_filename = "tweets.json" #return in json format
-
-    twitter_client = TwitterClient('elonmusk')
-    print(twitter_client.get_specific_tweet(1))
     
-    # twitter_streaner = TwitterStreamer()  
-    # twitter_streaner.stream_tweets(fetched_tweets_filename, match_doge)
+    twitter_client = TwitterClient();
+    tweet_analyzer = TweetAnalyzer()
+    
+    api = twitter_client.get_twitter_client_api()    
+    
+    tweets = api.user_timeline(screen_name = "elonmusk", count=20)
+    
+    # print(dir(tweets[0]))
+    df = tweet_analyzer.tweets_to_data_frame(tweets)
+    print(df.head(10)) 

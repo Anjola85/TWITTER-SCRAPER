@@ -4,8 +4,6 @@ from dotenv import load_dotenv
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
-
-
 #authentication function
 def twitter_auth():
     try:
@@ -28,7 +26,7 @@ def get_twitter_client():
 
 # function to check tweet for doge
 def get_tweet():
-    user = "Anjay75634879"
+    user = "elonmusk"
     client = get_twitter_client()
     tweet = ''
     
