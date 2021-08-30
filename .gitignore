@@ -1,9 +1,0 @@
-.env
-*.DS_Store
-*.vscode
-*__pycache__
-notes.txt
-settings.py
-regex_test.py
-test.py
-fetch_tweets.y
