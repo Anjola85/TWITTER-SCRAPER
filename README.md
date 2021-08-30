@@ -1,3 +1,0 @@
-** HOW TO RUN THE BOT **
-
-** CODE DOCUMENTATION **
