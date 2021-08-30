@@ -1,3 +1,6 @@
+"""
+TWITTER SCRAPER
+"""
 import tweepy
 from tweepy.streaming import StreamListener #listens to tweet based on certain keywords
 from tweepy import OAuthHandler #reponsible for authenticating based on env variables which are associated with the twitter app
@@ -61,6 +64,8 @@ class TwitterStreamer():
     """
     Class for streaming and processing live tweets.
     """
+    
+    # Default constructor
     def __init__(self):
         self.twitter_authenticator = TwitterAuthenticator()
     
@@ -112,13 +117,13 @@ class TweetAnalyzer():
     Functionality for analyzing and categorizing content from tweets.
     """
     def tweets_to_data_frame(self, tweets):
-        # creating a list by extracting texts from eact tweets with column tweets
+        # creating a data frame based on specified tweet content
         df = pd.DataFrame(data=[tweet.text for tweet in tweets], columns=['Tweets'])
         #vice vers but id
         df['id'] = np.array([tweet.id for tweet in tweets])
         df['len'] = np.array([len(tweet.text) for tweet in tweets])
         df['date'] = np.array([tweet.created_at for tweet in tweets])
-        df['source'] = np.array([tweet.source for tweet in tweets])
+        df['source'] = np.array([tweet.source for tweet in tweets]) #device that sent tweet
         df['likes'] = np.array([tweet.favorite_count for tweet in tweets])
         df['retweets'] = np.array([tweet.retweet_count for tweet in tweets])
         return df
